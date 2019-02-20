@@ -18,3 +18,7 @@
       service: 
         name: firewalld 
         state: restarted
+    - name: Create index file
+      template: src=../templates/index.html
+        dest=/var/www/html/index.html
+        backup=yes

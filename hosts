@@ -1,3 +1,5 @@
+[lbServer]
+192.168.56.116 ansible_ssh_user=vagrant
 [webserverA]
 192.168.56.117 ansible_ssh_user=vagrant
 [webserverB]

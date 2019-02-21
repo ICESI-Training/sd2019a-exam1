@@ -8,15 +8,24 @@
     - name: install nodejs
       yum: 
         name: nodejs
-    - name: Install the globally package "express".
-      npm:
-        name: express
-        global: yes
-        state: present
-    - name: Creates directory
+    - name: Create directory /var/www
       file:
         path: /var/www
         state: directory
+    - name: Create directory /var/www/public
+      file:
+        path: /var/www/public
+        state: directory
+    - name: Install the package "express".
+      npm:
+        name: express
+        path: /var/www
+        state: present
+    - name: Install the package "path".
+      npm:
+        name: path
+        path: /var/www
+        state: present
     - name: Open port 80 for http access
       firewalld:
         service: http
@@ -28,7 +37,11 @@
         backup=yes
     - name: Create index.html file
       template: src=../templates/index.html
-        dest=/var/www/index.html
+        dest=/var/www/public/index.html
+        backup=yes
+    - name: Create app.js file
+      template: src=../templates/app.js
+        dest=/var/www/public/app.js
         backup=yes
     - name: Copy server service
       template: src=../templates/serverApp.service

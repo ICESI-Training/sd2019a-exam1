@@ -1,19 +1,12 @@
-// content of index.js
-const http = require('http')
-const port = 80
+const express = require("express");
+const path = require('path');
+const app = new express();
 
-const requestHandler = (request, response) => {
-  console.log(request.url)
-  
-  response.end('Hello Node.js Server!')
-}
-
-const server = http.createServer(requestHandler)
-
-server.listen(port, (err) => {
-  if (err) {
-    return console.log('something bad happened', err)
-  }
-
-  console.log(`server is listening on ${port}`)
-})
+//app.use(express.static(__dirname + '/public'));
+app.get("/", function(req, resp) {
+  resp.sendFile(path.resolve(__dirname + '/public', 'index.html'));
+});
+app.get("/public/app.js", function(req, resp) {
+  resp.sendFile(path.resolve(__dirname + '/public/', 'app.js'));
+});
+app.listen("80");

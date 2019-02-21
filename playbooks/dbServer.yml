@@ -1,0 +1,22 @@
+---
+- hosts: dbServer
+  sudo: yes
+  tasks:
+    - name: Add Mongodb repository
+      yum_repository:
+        name: mongodb-org-4.0
+        description: MONGODB YUM repo
+        baseurl: https://repo.mongodb.org/yum/redhat/$releasever/mongodb-org/4.0/x86_64/
+        gpgkey: https://www.mongodb.org/static/pgp/server-4.0.asc
+    - name: install the latest version of Mongodb
+      yum:
+        name: mongodb-org
+        state: latest
+    - name: ensure mongodb is running
+      service:
+        name: mongod 
+        state: started
+    - name: Restart the firewalld service to load in the firewall changes
+      service: 
+        name: firewalld 
+        state: restarted

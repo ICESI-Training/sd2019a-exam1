@@ -2,13 +2,21 @@
 - hosts: webserverA, webserverB
   sudo: yes
   tasks:
-    - name: install apache
+    - name: install epel-release
       yum: 
-        name: httpd
-    - name: ensure httpd is running
-      service:
-        name: httpd 
-        state: started
+        name: epel-release
+    - name: install nodejs
+      yum: 
+        name: nodejs
+    - name: Creates directory
+      file:
+        path: /var/www
+        state: directory
+    - name: Install the globally package "http-server".
+      npm:
+        name: http-server
+        global: yes
+        state: present
     - name: Open port 80 for http access
       firewalld:
         service: http
@@ -20,5 +28,11 @@
         state: restarted
     - name: Create index file
       template: src=../templates/index.html
-        dest=/var/www/html/index.html
+        dest=/var/www/index.html
         backup=yes
+    - name: Create index.js file
+      template: src=../templates/index.js
+        dest=/var/www/index.js
+        backup=yes
+    - name: Execute server
+      shell: http-server /var/www/index.js -p 80

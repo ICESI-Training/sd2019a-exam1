@@ -1,0 +1,7 @@
+[Unit]
+Description=Nodejs server running
+[Service]
+ExecStart=/usr/bin/env node /var/www/server.js
+Restart=always
+[Install]
+WantedBy=multi-user.target

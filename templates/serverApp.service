@@ -2,6 +2,7 @@
 Description=Nodejs server running
 [Service]
 ExecStart=/usr/bin/env node /var/www/server.js
+WorkingDirectory=/var/www
 Restart=always
 [Install]
 WantedBy=multi-user.target

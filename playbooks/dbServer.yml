@@ -2,6 +2,14 @@
 - hosts: dbServer
   sudo: yes
   tasks:
+    - name: Add EPEL YUM repository
+      yum_repository:
+        name: epel
+        description: EPEL YUM repo
+        baseurl: https://download.fedoraproject.org/pub/epel/$releasever/$basearch/
+    - name: install epel-release
+      yum: 
+        name: epel-release
     - name: Add Mongodb repository
       yum_repository:
         name: mongodb-org-4.0
@@ -16,7 +24,20 @@
       service:
         name: mongod 
         state: started
+    - name: Install the mongodb packages
+      yum: 
+        name: libselinux-python, bc, python-pip 
+        state: present
+        disable_gpg_check: true
+    - name: Install the latest pymongo package
+      pip: name=pymongo state=latest
     - name: Restart the firewalld service to load in the firewall changes
       service: 
         name: firewalld 
         state: restarted
+    - name: Create mongoScript.js file
+      template: src=../templates/mongoScript.js
+        dest=/mongoScript.js
+        backup=yes
+    - name: Populate mongodb collections.
+      shell: mongo /mongoScript.js

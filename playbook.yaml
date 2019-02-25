@@ -1,0 +1,89 @@
+---
+- hosts: lb
+  sudo: yes
+  gather_facts: no  
+ 
+
+  tasks:
+
+  - name: install haproxy
+    yum: name=haproxy state=installed update_cache=yes
+
+  - name: write our haproxy.cfg
+    template: src=template/haproxy.cfg.j2 dest=/etc/haproxy/haproxy.cfg mode=644 owner=root group=root
+    notify: restart haproxy
+ 
+  handlers:
+
+  - name: start haproxy
+    service: name=haproxy state=started
+
+  - name: restart haproxy
+    service: name=haproxy state=restarted
+
+
+
+- hosts: web1
+  sudo: yes
+  gather_facts: no
+
+
+  tasks:
+  
+  - name: install epel-release
+    yum: name=epel-release state=installed update_cache=yes
+
+  - name: install nginx
+    yum: name=nginx state=installed disable_gpg_check=yes validate_certs=no skip_broken=yes
+
+  - name: write our index
+    template: src=template/index.html dest=/usr/share/nginx/html/ mode=644 owner=root group=root
+    notify: restart nginx
+      
+
+  handlers:
+
+  - name: start nginx
+    service: name=nginx state=started
+ 
+  - name: restart nginx
+    service: name=nginx state=restarted
+
+- hosts: web2
+  sudo: yes
+  gather_facts: no
+
+
+  tasks:
+  - name: install epel-release
+    yum: name=epel-release state=installed update_cache=yes
+
+  - name: install nginx
+    yum: name=nginx state=installed disable_gpg_check=yes validate_certs=no skip_broken=yes
+
+  - name: write our index
+    template: src=template/index2.html dest=/usr/share/nginx/html/index.html mode=644 owner=root group=root
+    notify: restart nginx
+
+  handlers:
+
+  - name: start nginx
+    service: name=nginx state=started
+
+  - name: restart nginx
+    service: name=nginx state=restarted
+
+
+- hosts: db
+  sudo: yes
+ 
+  tasks:
+  - name: install mariadb-server
+    yum: name=mariadb-server state=installed update_cache=yes
+  
+  - name: install mariadb
+    yum: name=mariadb state=installed update_cache=yes
+ 
+  - name: start mariadb
+    service: name=mariadb state=started
+

@@ -1,20 +1,22 @@
 const express = require("express");
-let  mongoose = require('mongoose');
 const app = new express();
 
 app.use(express.static(__dirname + '/public'));
 
-var router = express.Router();              // get an instance of the express Router
+const router = express.Router(); // get an instance of the express Router
 
-// test route to make sure everything is working (accessed at GET http://localhost:8080/api)
-router.get('/dinosaurs', function (req, res) {
-    mongoose.connect('mongodb://{{load_balancer_ip}}:{{mongos_port}}@{{load_balancer_ip}}:{{mongos_port}}/{{mongodb_database}}');
-    const animalSchema = new mongoose.Schema({ name: String, type: String });
+router.get('/dinosaurs', (req, res) => {
+    const MongoClient = require('mongodb').MongoClient;
+    const url = 'mongodb://{{mongodb_user}}:{{mongodb_user_password}}@{{database_ip}}:{{mongos_port}}/';
 
-    let Animal = mongoose.model('dinosaurs', animalSchema);
-
-    Animal.find({}, '', function (err, animal) {
-        return res.json(animal);
+    MongoClient.connect(url, (err, db) => {
+        if (err) throw err;
+        let dbo = db.db("{{mongodb_database}}");
+        dbo.collection("{{mongodb_collection}}").find({}).toArray((err, result) => {
+            if (err) throw err;
+            db.close();
+            return res.json(result);
+        });
     });
 });
 app.use('/api', router);

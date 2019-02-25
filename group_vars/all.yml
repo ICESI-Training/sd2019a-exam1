@@ -1,4 +1,5 @@
 load_balancer_ip: 192.168.56.116
+database_ip: 192.168.56.119
 haproxy_backend_servers:
   - {name: webserverA, ip: 192.168.56.117, port: 80, paramstring: cookie A check}
   - {name: webserverB, ip: 192.168.56.118, port: 80, paramstring: cookie B check}

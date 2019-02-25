@@ -7,9 +7,6 @@
         name: epel
         description: EPEL YUM repo
         baseurl: https://download.fedoraproject.org/pub/epel/$releasever/$basearch/
-    - name: install epel-release
-      yum: 
-        name: epel-release
     - name: Add Mongodb repository
       yum_repository:
         name: mongodb-org-4.0
@@ -20,7 +17,7 @@
       yum:
         name: mongodb-org
         state: latest
-    - name: ensure mongodb is running
+    - name: ensure mongodb is restarted
       service:
         name: mongod 
         state: started
@@ -31,13 +28,30 @@
         disable_gpg_check: true
     - name: Install the latest pymongo package
       pip: name=pymongo state=latest
-    - name: Restart the firewalld service to load in the firewall changes
-      service: 
-        name: firewalld 
-        state: restarted
     - name: Create mongoScript.js file
       template: src=../templates/mongoScript.js
         dest=/mongoScript.js
         backup=yes
     - name: Populate mongodb collections.
       shell: mongo /mongoScript.js
+    - name: Copy mongod.conf file
+      template: src=../templates/mongod.conf
+        dest=/etc/mongod.conf
+        backup=yes
+    - name: ensure mongodb is restarted
+      service:
+        name: mongod 
+        state: restarted
+    - name: Enabled 27017 port
+      firewalld:
+        port: 27017/tcp
+        permanent: yes
+        state: enabled
+    - name: Copy /etc/sysconfig/iptables file
+      template: src=../templates/iptables
+        dest=/etc/sysconfig/iptables
+        backup=yes
+    - name: Restart the firewalld service to load in the firewall changes
+      service: 
+        name: firewalld 
+        state: restarted

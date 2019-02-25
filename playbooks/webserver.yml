@@ -21,6 +21,11 @@
         name: express
         path: /var/www
         state: present
+    - name: Install the package "mongodb".
+      npm:
+        name: mongodb
+        path: /var/www
+        state: present
     - name: Install the package "mongoose".
       npm:
         name: mongoose

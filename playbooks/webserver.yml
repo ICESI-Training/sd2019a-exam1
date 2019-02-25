@@ -5,6 +5,10 @@
     - name: install epel-release
       yum: 
         name: epel-release
+    - name: update openssl
+      yum: 
+        name: openssl
+        state: latest
     - name: install nodejs
       yum: 
         name: nodejs

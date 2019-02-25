@@ -22,6 +22,7 @@ collection.insertMany([
     { name: 'Stegosaurus', type: "Herbivorous" }
 ], (err, result) => { });
 
+// Access using the node.js bash
 db.removeUser(mongodb_user);
 db.createUser(
     {
@@ -30,4 +31,15 @@ db.createUser(
         roles: [{ role: "read", db: mongodb_database }]
     }
 );
+// Access using the browser fetch to endpoint
+const adminDb = client.getDB("admin");
+adminDb.removeUser(mongodb_user);
+adminDb.createUser(
+    {
+        user: mongodb_user,
+        pwd: mongodb_user_password,
+        roles: [{ role: "read", db: mongodb_database }]
+    }
+);
+
 

@@ -26,35 +26,28 @@
         name: mongodb
         path: /var/www
         state: present
-    - name: Install the package "mongoose".
-      npm:
-        name: mongoose
-        path: /var/www
-        state: present
-    - name: Install the package "path".
-      npm:
-        name: path
-        path: /var/www
-        state: present
     - name: Open port 80 for http access
       firewalld:
         service: http
         permanent: true
         state: enabled
     - name: Create server.js file
-      template: src=../templates/server.js
+      template: src=../templates/scripts/server.js
         dest=/var/www/server.js
         backup=yes
     - name: Create index.html file
-      template: src=../templates/index.html
+      template: src=../templates/public/index.html
         dest=/var/www/public/index.html
         backup=yes
     - name: Create app.js file
-      template: src=../templates/app.js
+      template: src=../templates/public/app.js
         dest=/var/www/public/app.js
+    - name: Create app.css file
+      template: src=../templates/public/app.css
+        dest=/var/www/public/app.css
         backup=yes
     - name: Copy server service
-      template: src=../templates/serverApp.service
+      template: src=../templates/config_files/serverApp.service
         dest=/etc/systemd/system/serverApp.service
     - name: restart service cron on centos, in all cases, also issue daemon-reload to pick up config changes
       systemd:

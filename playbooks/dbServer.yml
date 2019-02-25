@@ -28,14 +28,14 @@
         disable_gpg_check: true
     - name: Install the latest pymongo package
       pip: name=pymongo state=latest
-    - name: Create mongoScript.js file
-      template: src=../templates/mongoScript.js
-        dest=/mongoScript.js
+    - name: Create populateMongo.js file
+      template: src=../templates/scripts/populateMongo.js
+        dest=/populateMongo.js
         backup=yes
     - name: Populate mongodb collections.
-      shell: mongo /mongoScript.js
+      shell: mongo /populateMongo.js
     - name: Copy mongod.conf file
-      template: src=../templates/mongod.conf
+      template: src=../templates/config_files/mongod.conf
         dest=/etc/mongod.conf
         backup=yes
     - name: ensure mongodb is restarted
@@ -48,7 +48,7 @@
         permanent: yes
         state: enabled
     - name: Copy /etc/sysconfig/iptables file
-      template: src=../templates/iptables
+      template: src=../templates/config_files/iptables
         dest=/etc/sysconfig/iptables
         backup=yes
     - name: Restart the firewalld service to load in the firewall changes

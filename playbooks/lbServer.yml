@@ -9,7 +9,7 @@
         name: haproxy 
         state: started
     - name: Update HAProxy config
-      template: src=../templates/haproxy.cfg
+      template: src=../templates/config_files/haproxy.cfg
         dest=/etc/haproxy/haproxy.cfg
         backup=yes
     - name: restart haproxy

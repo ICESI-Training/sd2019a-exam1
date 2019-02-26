@@ -1,0 +1,82 @@
+- name: connfiguracion de servidor httpd 
+  hosts: webservers 
+  become: yes
+  become_user: root
+  become_method: sudo
+  tasks:
+  - name: instalar httpd
+    yum:
+      name: httpd
+      state: present
+  - name: instalar firewalld
+    yum:
+      name: firewalld
+      state: present
+  - name: instalar epel-release 
+    yum:
+      name: epel-release 
+      state: present
+  - name: instalar pip 
+    yum:
+      name: python-pip 
+      state: present
+  - pip: 
+      name: psycopg2
+  - pip:
+      name: psycopg2-binary
+  - name: instalar mod_wsgi, modulo para app
+    yum:
+      name: mod_wsgi
+      state: present
+  - name: instalar psycopg2, modula para lectura de bd
+    yum:
+      name: python-psycopg2
+      state: present
+  - name: verificar que este corriendo httpd
+    service:
+      name: httpd 
+      state: started
+  - name: verificar que este corriendo firewall
+    service:
+      name: firewalld
+      state: started
+  - name: abrir puerto 80 para http 
+    firewalld:
+      service: http
+      permanent: true
+      state: enabled
+  - name: reiniciar el firewall 
+    service: 
+      name: firewalld 
+      state: restarted
+  - name: permitir el acceso a la base de datos
+    command:  setsebool -P httpd_can_network_connect_db 1
+    sudo: yes
+  - name: verificar que la configurarcion no exista
+    stat:
+      path: /var/www/python 
+    register: directory_exists
+  - name: configurando handler 
+    command: "{{ item }}"
+    with_items:
+    - mkdir /var/www/python
+    - chown apache:apache /var/www/python
+    sudo: yes
+    when: not directory_exists.stat.exists
+  - name: copy configuration file 
+    copy:
+        src: backend/app.conf 
+        dest: /etc/httpd/conf.d/app.conf
+        owner: root
+        mode: 0777
+  - name: deploy app 
+    copy:
+        src: backend/app.py
+        dest: /var/www/python/app.py 
+        owner: root
+        mode: 0777
+  - name: reiniciar el servidor web 
+    service:
+      name: httpd
+      state: restarted
+

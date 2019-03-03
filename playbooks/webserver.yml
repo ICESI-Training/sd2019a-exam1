@@ -1,0 +1,69 @@
+---
+- hosts: webserverA, webserverB
+  sudo: yes
+  tasks:
+    - name: install epel-release
+      yum: 
+        name: epel-release
+    - name: update openssl
+      yum: 
+        name: openssl
+        state: latest
+    - name: install nodejs
+      yum: 
+        name: nodejs
+    - name: Create directory /var/www
+      file:
+        path: /var/www
+        state: directory
+    - name: Create directory /var/www/public
+      file:
+        path: /var/www/public
+        state: directory
+    - name: Install the package "express".
+      npm:
+        name: express
+        path: /var/www
+        state: present
+    - name: Install the package "mongodb".
+      npm:
+        name: mongodb
+        path: /var/www
+        state: present
+    - name: Open port 80 for http access
+      firewalld:
+        service: http
+        permanent: true
+        state: enabled
+    - name: Create server.js file
+      template: src=../templates/scripts/server.js
+        dest=/var/www/server.js
+        backup=yes
+    - name: Create index.html file
+      template: src=../templates/public/index.html
+        dest=/var/www/public/index.html
+        backup=yes
+    - name: Create app.js file
+      template: src=../templates/public/app.js
+        dest=/var/www/public/app.js
+    - name: Create app.css file
+      template: src=../templates/public/app.css
+        dest=/var/www/public/app.css
+        backup=yes
+    - name: Copy server service
+      template: src=../templates/config_files/serverApp.service
+        dest=/etc/systemd/system/serverApp.service
+    - name: restart service cron on centos, in all cases, also issue daemon-reload to pick up config changes
+      systemd:
+        state: restarted
+        daemon_reload: yes
+        name: serverApp
+    - name: Enable service serverApp
+      service:
+        name: serverApp
+        state: started
+        enabled: yes
+    - name: Restart the firewalld service to load in the firewall changes
+      service: 
+        name: firewalld 
+        state: restarted

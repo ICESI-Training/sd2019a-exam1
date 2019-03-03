@@ -1,0 +1,14 @@
+body {
+    font-family: Helvetica Neue, Helvetica, Arial, sans-serif;
+    display: flex;
+    justify-content: center;
+    background-color: aliceblue;
+    color: #616469;
+}
+h1{
+    color: dimgrey;
+}
+li {
+    padding: 2px;
+    size: 2em;
+}

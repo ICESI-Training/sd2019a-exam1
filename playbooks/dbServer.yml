@@ -1,0 +1,57 @@
+---
+- hosts: dbServer
+  sudo: yes
+  tasks:
+    - name: Add EPEL YUM repository
+      yum_repository:
+        name: epel
+        description: EPEL YUM repo
+        baseurl: https://download.fedoraproject.org/pub/epel/$releasever/$basearch/
+    - name: Add Mongodb repository
+      yum_repository:
+        name: mongodb-org-4.0
+        description: MONGODB YUM repo
+        baseurl: https://repo.mongodb.org/yum/redhat/$releasever/mongodb-org/4.0/x86_64/
+        gpgkey: https://www.mongodb.org/static/pgp/server-4.0.asc
+    - name: install the latest version of Mongodb
+      yum:
+        name: mongodb-org
+        state: latest
+    - name: ensure mongodb is restarted
+      service:
+        name: mongod 
+        state: started
+    - name: Install the mongodb packages
+      yum: 
+        name: libselinux-python, bc, python-pip 
+        state: present
+        disable_gpg_check: true
+    - name: Install the latest pymongo package
+      pip: name=pymongo state=latest
+    - name: Create populateMongo.js file
+      template: src=../templates/scripts/populateMongo.js
+        dest=/populateMongo.js
+        backup=yes
+    - name: Populate mongodb collections.
+      shell: mongo /populateMongo.js
+    - name: Copy mongod.conf file
+      template: src=../templates/config_files/mongod.conf
+        dest=/etc/mongod.conf
+        backup=yes
+    - name: ensure mongodb is restarted
+      service:
+        name: mongod 
+        state: restarted
+    - name: Enabled 27017 port
+      firewalld:
+        port: 27017/tcp
+        permanent: yes
+        state: enabled
+    - name: Copy /etc/sysconfig/iptables file
+      template: src=../templates/config_files/iptables
+        dest=/etc/sysconfig/iptables
+        backup=yes
+    - name: Restart the firewalld service to load in the firewall changes
+      service: 
+        name: firewalld 
+        state: restarted

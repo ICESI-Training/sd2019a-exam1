@@ -1,0 +1,12 @@
+load_balancer_ip: 192.168.56.116
+database_ip: 192.168.56.119
+haproxy_backend_servers:
+  - {name: webserverA, ip: 192.168.56.117, port: 80, paramstring: cookie A check}
+  - {name: webserverB, ip: 192.168.56.118, port: 80, paramstring: cookie B check}
+mongos_port: 27017
+mongodb_admin_user: webAdmin
+mongodb_admin_password: 123456
+mongodb_user: webUser
+mongodb_user_password: 123456
+mongodb_database: webDatabase
+mongodb_collection: dinosaurs

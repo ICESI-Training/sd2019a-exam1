@@ -1,0 +1,27 @@
+---
+- hosts: lbServer
+  sudo: yes
+  tasks:
+    - name: install haproxy
+      yum: name=haproxy state=present
+    - name: ensure haproxy is running
+      service:
+        name: haproxy 
+        state: started
+    - name: Update HAProxy config
+      template: src=../templates/config_files/haproxy.cfg
+        dest=/etc/haproxy/haproxy.cfg
+        backup=yes
+    - name: restart haproxy
+      service:
+        name: haproxy 
+        state: restarted
+    - name: Open port 80 for http access
+      firewalld:
+        service: http
+        permanent: true
+        state: enabled
+    - name: Restart the firewalld service to load in the firewall changes
+      service: 
+        name: firewalld 
+        state: restarted

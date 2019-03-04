@@ -1,5 +1,5 @@
 - name: connfiguracion de servidor httpd 
-  hosts: webservers 
+  hosts: all 
   become: yes
   become_user: root
   become_method: sudo
@@ -79,4 +79,11 @@
     service:
       name: httpd
       state: restarted
-
+  - name: initialize db table and add some values
+    copy:
+        src: backend/initializedb.py
+        dest: /var/www/python/init.py
+        owner: root
+        mode: 0777
+  - name: initializing
+    command: python /var/www/python/init.py

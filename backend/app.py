@@ -1,7 +1,10 @@
 def application(environ, start_response):
     import psycopg2
+    import socket
     status = '200 OK'
-    output = 'BIENVENIDO, tenemos estas peliculas:!'
+    ip = socket.gethostbyname(socket.gethostname())
+    output = 'BIENVENID, tenemos estos autores:!'
+    output += ip
     conn = psycopg2.connect(database="root", user="postgres", host="192.168.56.5", port="5432")
     cur = conn.cursor()
     cur.execute("SELECT * FROM peliculas")

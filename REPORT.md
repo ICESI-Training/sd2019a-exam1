@@ -17,16 +17,104 @@ Para este examen, vamos a desplegar una plataforma que permita realizar consulta
 
 La creación y configuración de cada servidor se debe hacer con la herramienta Ansible de forma remota sobre las máquinas virtuales ya desplegadas con vagrant.
 
+## 3. Servidor Web
+Para el servidor web, 
 
-## 3. Base de datos 
+## 4. Base de datos 
  Para la base de datos creamos una estructura de carpetas, primero se creó un archivo inicial llamado postgresql_playbooks.yml 
  
- ![](/images/db1.PNG) 
- **Figura 1 - playbook postgresql**
+ ![](/images/db1.PNG)  
+ **Figura 1 - playbook postgresql**.  
+ Se especifíca el grupo de host que se creó previamente, luego especificamos el become, ya que debemos estar como usuario root, especificamos la carpeta donde se encuentran las variables a usar que son nombre de la base de datos, usuario y contraseña.  
+ ```ansible
+db_user: root
+db_name: root
+db_password: password
+ ```  
+ Por último, especificamos la carpeta de roles, aquí van las tareas que se van a ejecutar para poder crear la base de datos.  
  
- se especifíca el grupo de host que se creó previamente, 
- 
- 
+```ansible
+- name: restart postgresql
+  service: name=postgresql state=restarted
+```  
+```ansible
+- name: restart postgresql
+  service: name=postgresql state=restarted
+```- name: Install PostgreSQL
+  yum: name={{ item }} update_cache=true state=installed
+  with_items:
+    - postgresql-server
+    - postgresql-contrib
+    - python-psycopg2
+  tags: packages
+
+- name: initdb
+  command: postgresql-setup initdb creates=/var/lib/pgsql/data/pg_hba.conf
+  sudo: yes
+
+- name: Ensure the PostgreSQL service is running
+  service: name=postgresql state=started enabled=yes
+
+- name: Ensure database is created
+  become: yes
+  become_user: postgres 
+  become_method: sudo
+  postgresql_db: name={{ db_name }}
+             encoding='UTF-8'
+             lc_collate='en_US.UTF-8'
+             lc_ctype='en_US.UTF-8'
+             template='template0'
+             state=present
+
+- name: Ensure user has access to the database
+  become: yes
+  become_user: postgres 
+  become_method: sudo
+  postgresql_user: db={{ db_name }}
+               name={{ db_user }}
+               password={{ db_password }}
+               priv=ALL
+               state=present
+
+- name: Ensure user does not have unnecessary privileges
+  become: yes
+  become_user: postgres 
+  become_method: sudo
+  postgresql_user: name={{ db_user }}
+               role_attr_flags=NOSUPERUSER,NOCREATEDB
+               state=present
+
+- name: add lines to postgre.conf file
+  become: yes
+  become_user: postgres
+  become_method: sudo
+  lineinfile:
+    line: "listen_addresses = '*'"
+    dest: "/var/lib/pgsql/data/postgresql.conf"
+
+- name: add lines to postgre.conf file
+  become: yes
+  become_user: postgres
+  become_method: sudo
+  lineinfile:
+    line: "port = 5432"
+    dest: "/var/lib/pgsql/data/postgresql.conf"
+
+- name: add lines to pg_hba.conf file
+  become: yes
+  become_user: postgres
+  become_method: sudo
+  lineinfile:
+    line: "host    all             all             0.0.0.0/0               trust"
+    insertbefore: BOF
+    dest: "/var/lib/pgsql/data/pg_hba.conf"
+
+- name: reiniciar postgresql 
+  service:
+    name: postgresql 
+    state: restarted
+```  
+
 ## 7. Problemas
  tuvimos problemas en aspectos como:
  

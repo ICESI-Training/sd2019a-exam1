@@ -114,6 +114,10 @@ db_password: password
     name: postgresql 
     state: restarted
 ```  
+## 5. Integración
+Cada integrante del grupo se encargó de una tecnología en específico.  
+Se crearon 3 ramas donde cada integrante hacia commits de su trabajo y se revisaba lo que estaba haciendo el otro compañero para hacerle comentarios de su trabajo y si debía corregir algún error.
+
 
 ## 7. Problemas
  tuvimos problemas en aspectos como:

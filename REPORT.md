@@ -18,11 +18,50 @@ Para este examen, vamos a desplegar una plataforma que permita realizar consulta
 La creación y configuración de cada servidor deberá estar desplegada en **Ansible** de forma remota sobre las máquinas virtuales que se encuentran montadas sobre **Vagrant.**
 
 ## 3. Servidor Web
-El servidor web que utilizaremos para la práctica será Apache, en el cual haremos las configuraciones habituales.  
+El servidor web que utilizaremos para la práctica será Apache, en el cual haremos las configuraciones habituales. Posteriormente para nuestra app, configuraremos ciertos archivos de configuración.  
 
 ## 4. Base de datos 
 Para la base de datos haremos uso de una base de datos relacional --Postgresql-- Creamos una estructura de carpetas y un archivo inicial llamado postgresql_playbooks.yml 
- 
+
+## 5. Aplicación 
+
+para instalar nuestra aplicación instalaremos pip y mediante el realizaremos la instalación de los paquetes necesarios para correr nuestro servicio.
+para nuestro backend utilizaremos python, en especifico la libreria mod_wsgi. configuraremos un handler para las solicitudes http y en dentro de él realizaremos la consulta a la base de datos.
+
+nuestra aplicacion toma los datos obtenidos y escribe una respuesta
+```
+def application(environ, start_response):
+    import psycopg2
+    import socket
+    status = '200 OK'
+    ip = socket.gethostbyname(socket.gethostname())
+    output = 'BIENVENID, tenemos estos autores:!'
+    output += ip
+    conn = psycopg2.connect(database="root", user="postgres", host="192.168.56.5", port="5432")
+    cur = conn.cursor()
+    cur.execute("SELECT * FROM peliculas")
+    records= cur.fetchall()
+    for record in records:
+        output += repr(record)
+    cur.close()
+    conn.close()
+    response_headers = [('Content-type', 'text/plain'),
+                        ('Content-Length', str(len(output)))]
+    start_response(status, response_headers)
+    return [output]
+
+
+``` 
+
+además escribiremos el siguiente archivo de configuración dentro de las configuraciones de nuestro servicio httpd:
+
+```
+WSGIScriptAlias /app /var/www/python/app.py
+```
+Ambos archivos son transferidos a las maquinas en el momento en que el playbook se ejecuta.
+
+finalmente dentro del playbook nos aseguraremos de cambiar la configuración de SELinux para permitir el acceso a bases de datos remotas y escribiremos ciertas entradas de prueba en esta.
+
  ![](/images/db1.PNG)  
  **Figura 1 - playbook postgresql**.  
 Se especifíca el grupo de host que se creó previamente. Luego, iniciamos sesión como usuario root mediante become_user; seguido establecemos la carpeta donde se encuentrarán las variables que usaremos para crear la base de datos: nombre de la base de datos, usuario y contraseña.  

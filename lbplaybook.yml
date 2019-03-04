@@ -1,0 +1,30 @@
+- name: configurar balanceador de carga haproxy 
+  hosts: load_balancer 
+  become: yes
+  become_user: root
+  become_method: sudo
+  vars:
+    haproxy_app_name: app 
+    haproxy_mode: http
+    haproxy_enable_stats: enable
+    haproxy_algorithm: roundrobin
+    haproxy_backend_servers:
+      - {name: server1, ip: 192.168.56.3, port: 80, paramstring: cookie A check}
+      - {name: server2, ip: 192.168.56.4, port: 80, paramstring: cookie A check}
+    haproxy_stats_users:
+      - {username: vagrant, password: password}
+
+  tasks:
+  - name: Instalar haproxy 
+    yum:
+      name: haproxy 
+      state: present
+  - name: actualizar config
+    template: src=templates/haproxy.cfg
+        dest=/etc/haproxy/haproxy.cfg
+        backup=yes
+  - name: reiniciar haproxy 
+    service:
+      name: haproxy 
+      state: restarted
+

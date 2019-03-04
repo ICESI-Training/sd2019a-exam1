@@ -1,20 +1,33 @@
-# Examen 1 Sistemas distribuidos
+# Examen 1
+## Universidad Icesi
+###### Materia: Sistemas Distribuidos
+###### Profesor: Daniel Barragán C.
+###### Tema: Infrastructure Automation
+###### Estudiantes: Daniel Pérez, Steven Montealegre, Miguel Isaza
+###### Códigos: A00018200, A00014976, A00054628
 
- **Integrantes:** Daniel Perez Garcia, Miguel Andres Isaza, Steven Montealegre
+## Tecnologías utilizadas
+* Vagrant
+* Ansible
+* Centos7
+* Repositorio GitHub
 
- **Códigos:** A00018200,
+### Descripción de la infraestructura
+Para este examen, vamos a desplegar una plataforma que permita realizar consultas a una base de datos desde una aplicación web. El usuario hace una petición al balanceador de carga y este debe redireccionarlas a los servidores web 1 y 2, a través de la página el usuario debe poder realizar consultas a una única base de datos.
 
- **Emails:** daniel.perez1@correo.icesi.edu.co
+La creación y configuración de cada servidor se debe hacer con la herramienta Ansible de forma remota sobre las máquinas virtuales ya desplegadas con vagrant.
 
- **Curso:** Sistemas Distribuidos
 
- **Tema:**  Automatización de Infraestructura con Vagrant y Ansible
-
- **Docente:** Daniel Barragán
+## 3. Base de datos 
+ Para la base de datos creamos una estructura de carpetas, primero se creó un archivo inicial llamado postgresql_playbooks.yml 
+ 
+ ![](/images/db1.PNG) 
+ **Figura 1 - playbook postgresql**
+ 
+ se especifíca el grupo de host que se creó previamente, 
  
  
- 
- Problemas
+## 7. Problemas
  tuvimos problemas en aspectos como:
  
  la definicion de la ejecucion de los playbooks dentro del vagrantfile para solo un equipo cuando los demas del grupo no habian sido creados, cosa que solucionamos usando el atributo limit=ip del nodo

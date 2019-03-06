@@ -1,0 +1,9 @@
+- name: Create a PostgreSQL DB server
+  hosts: all
+  become: true
+  become_method: sudo
+  vars_files:
+    - roles/createdb/vars/main.yml
+
+  roles:
+  - createdb

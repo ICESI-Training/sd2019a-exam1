@@ -1,0 +1,19 @@
+---
+- hosts: all
+  remote_user: root
+  become: true
+  become_method: sudo
+  tasks:
+    - name: instalando haproxy
+      yum:
+        name: haproxy
+    - name: habilitando haproxy
+      service:
+        name: haproxy
+        state: started
+
+    - name: copiando plantilla balanceador
+      copy:
+        src: /home/distribuidosjsgd/Documentos/parcial1sd/playbooks/files/lb_config.j2
+        dest: /etc/haproxy/haproxy.cfg
+        remote_src: false	

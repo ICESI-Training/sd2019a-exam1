@@ -1,0 +1,7 @@
+---
+db_user: postgres
+db_name: libros
+db_password: password
+
+mongodb:
+    dbpath: /var/lib/mongo

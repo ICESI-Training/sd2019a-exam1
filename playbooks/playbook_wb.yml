@@ -1,0 +1,42 @@
+- hosts: all
+  user: root
+  become: true
+  become_method: sudo
+  tasks:
+  - name: Configurando node
+    yum: name=http://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
+  - name: instalando nodejs
+    yum: 
+      name: nodejs
+  - name: instalando npm
+    yum:
+      name: npm
+  - name: instalando epm2
+    npm:
+      name: pm2
+      path: /server
+  
+  - name: instalando module pg
+    npm:
+     name: pg
+     path: /server 
+      
+  - name: creando carpetas de srv
+    file:
+       path: /server
+       state: directory
+  #- name: instalando ip
+  #  npm:
+  #    name: ip
+  #    path: /server
+       
+  - name: Plantilla de servidor web
+    copy:
+      src: /home/distribuidosjsgd/Documentos/parcial1sd/playbooks/files/template_web.j2
+      dest: /server/app.js
+      remote_src: false
+  - name: iniciando servidor
+    shell: /server/node_modules/pm2/bin/pm2 start -f /server/app.js
+   # when: npm_finished.changed
+  
+
